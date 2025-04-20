@@ -1,0 +1,24 @@
+1.github
+2.crud user management,crud task management
+3.users=[{"id":guid,
+user_name:string,
+email:string,
+password:md5,
+status:"active",
+role:string,["admin","user","manage"]
+created_by:string,
+created_at:date,
+user_modify:string,
+update_at:date}]
+
+tasks=[{"id":guid,
+tittle:string,
+description:string,
+username:default user login,
+from_date:date,
+to_date:date,
+status:["tạo mới","tiến trình","hoàn thành","hết hạn"]
+created_by:string,
+created_at:date,
+user_modify:string,
+update_at:date}]
