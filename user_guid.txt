@@ -22,3 +22,21 @@ created_by:string,
 created_at:date,
 user_modify:string,
 update_at:date}]
+
+4.
+-hiển thị login form người dùng login băng email và mật khẩu đã đăng ký
+login thành công sẽ vào dashboard có 3 chức năng chính là user management,task management,report(chưa làm)
+và có 3 roles chính user,manage,admin
+ + user management hiển thị list view cho phép thêm, xóa ,sửa người dùng với role user va manage chỉ được edit và delete trên chỉnh user của mình
+   role admin sẽ được edit trên mọi user
+ + task management hiển thị list view cho phép thêm, xóa ,sửa người dùng,với role user thì chỉ xem và thêm xóa sửa trên task do chính mình tạo ra
+ role manage sẽ xem được tất cả các task chỉ được thêm xóa sửa với những task của chỉnh mình
+ role admin sẽ được thực hiện tất cả các quyền
+
+thiết kế cấu trúc file data:trịnh, nhựt, phú
+(user)thêm ,xoa ,sửa ,tìm kiềm :trịnh , nhựt, phú
+(task)thêm ,xoa ,sửa ,tìm kiềm :trịnh , nhựt, phú
+quản lý code:trịnh
+thiết kế hướng dẫn người dùng:trịnh , nhựt, phú
+powerpoint:nhựt, phú
+docs:nhựt, phú
