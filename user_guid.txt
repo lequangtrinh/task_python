@@ -17,6 +17,8 @@ description:string,
 username:default user login,
 from_date:date,
 to_date:date,
+assignee:string,
+high:string,//medium,high
 status:["tạo mới","tiến trình","hoàn thành","hết hạn"]
 created_by:string,
 created_at:date,
