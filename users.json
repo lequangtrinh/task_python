@@ -1,0 +1,59 @@
+{
+    "data": [
+        {
+            "password": "b0baee9d279d34fa1dfd71aadb908c3f",
+            "email": "lequangtrinh0811@gmail.com",
+            "role": "admin",
+            "username": "Le Quang Trinh",
+            "gender": "Male",
+            "create_at": "2025-04-05 09:40:43.035650",
+            "update_at": "2025-04-05 09:40:43.035650",
+            "is_delete": false,
+            "active": true
+        },
+        {
+            "password": "e10adc3949ba59abbe56e057f20f883e",
+            "email": "tranminhnat@gmail.com",
+            "role": "user",
+            "username": "Tran Minh Nat",
+            "gender": "Male",
+            "create_at": "2025-04-05 09:40:43.035650",
+            "update_at": "2025-04-05 09:40:43.035650",
+            "is_delete": false,
+            "active": true
+        },
+        {
+            "password": "e10adc3949ba59abbe56e057f20f883e",
+            "email": "hoangvy@gmail.com",
+            "role": "manage",
+            "username": "Hoang Vy",
+            "gender": "Female",
+            "create_at": "2025-04-05 09:40:43.035650",
+            "update_at": "2025-04-05 09:40:43.035650",
+            "is_delete": false,
+            "active": true
+        },
+        {
+            "password": "7331090648c0dd811359587d4fc5d100",
+            "email": "trinh@gmail.com",
+            "role": "user",
+            "username": "Trinh",
+            "gender": "Female",
+            "create_at": "2025-04-05 10:50:58",
+            "update_at": "2025-04-05 10:50:58",
+            "is_delete": false,
+            "active": true
+        },
+        {
+            "password": "5695088daab72366267e348ebc125e01",
+            "email": "leherhe@gmai.com",
+            "role": "user",
+            "username": "Le Her He",
+            "gender": "Male",
+            "create_at": "2025-04-05 11:02:18",
+            "update_at": "2025-04-05 11:02:18",
+            "is_delete": false,
+            "active": true
+        }
+    ]
+}
