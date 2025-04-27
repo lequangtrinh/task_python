@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk,messagebox
 from datetime import datetime
 from tkcalendar import DateEntry
+from user_manager_handler import UserManager
 from utils import format_date, create_form_input,on_button_hover,on_button_leave
 class TaskManagerUI:
     def __init__(self, parent, role, user_email, task_manager):
@@ -10,7 +11,7 @@ class TaskManagerUI:
         self.role = role
         self.user_email = user_email
         self.task_manager = task_manager
-
+        self.user_manager = UserManager(user_email, role)
         if isinstance(self.root, tk.Tk):
             self.root.title("Task Manager")
             self.root.state('zoomed')  
@@ -121,7 +122,6 @@ class TaskManagerUI:
         self.tree.tag_configure("odd", background="#ffffff")
 
         self.show_tasks()
-
     def on_checkbox_click(self, task_id):
         print("edit")
     def show_create_task_form(self):
@@ -132,14 +132,14 @@ class TaskManagerUI:
 
         form_frame = tk.Frame(self.task_form, bg="white")
         form_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
-
+        user_emails = self.user_manager.get_emails_by_role()
         # Danh sách trường nhập
         fields = [
             ("Tiêu Đề Công Việc:", "", False, False, None),
             ("Mô Tả Công Việc:", "", False, True, None),
             ("Ngày Bắt Đầu:", "", False, True, None),
             ("Ngày Kết Thúc:", "", False, True, None),
-            ("Người Giao Công Việc (Email):", "", False, False, None),
+            ("Người Giao Công Việc (Email):", "", True, False,  user_emails),
             ("Mức Độ Ưu Tiên:", "", True, False, ["Cao", "Trung Bình", "Thấp"]),
             ("Điểm Công Việc:", "", False, False, None)
         ]
@@ -154,7 +154,11 @@ class TaskManagerUI:
             label = tk.Label(form_frame, text=label_text, font=("Arial", 12, "bold"), bg="white", anchor="w")
             label.grid(row=i, column=0, sticky="w", padx=10, pady=5)
 
-            entry = create_form_input(form_frame, label_text, i,
+            if label_text == "Điểm Công Việc:":
+                entry = tk.Spinbox(form_frame, from_=0, to=10, increment=0.5,width=15) 
+                entry.grid(row=i, column=1, padx=10, pady=5, sticky="w")
+            else:
+                entry = create_form_input(form_frame, label_text, i,
                                     is_combobox=is_combobox, values=values,
                                     is_date=is_date, is_text=is_text)
 
@@ -179,41 +183,31 @@ class TaskManagerUI:
         event.widget.config(bg="white")
 
     def create_task(self):
-        title = self.title_entry.get()
-        description = self.desc_entry.get()
-        assigned_to = self.assigned_to_entry.get()
-        start_date_str = self.start_date_entry.get()
-        end_date_str = self.end_date_entry.get()
-        priority = self.priority_entry.get()
-        point = self.point_entry.get()
-
+        title = self.create_entries["Tiêu Đề Công Việc:"].get()
+        description = self.create_entries["Mô Tả Công Việc:"].get("1.0", "end-1c")  # Get text area content
+        assigned_to = self.create_entries["Người Giao Công Việc (Email):"].get()
+        start_date_str = self.create_entries["Ngày Bắt Đầu:"].get_date()  # Get the date from the calendar widget
+        end_date_str = self.create_entries["Ngày Kết Thúc:"].get_date()  # Get the date from the calendar widget
+        priority = self.create_entries["Mức Độ Ưu Tiên:"].get()
+        point = self.create_entries["Điểm Công Việc:"].get()
         if not title or not description or not assigned_to or not start_date_str or not end_date_str or not priority or not point:
             messagebox.showerror("Missing Information", "All fields are required.")
             return
-
-        try:
-            start_date = datetime.strptime(start_date_str, "%Y-%m-%d %H:%M:%S")
-            end_date = datetime.strptime(end_date_str, "%Y-%m-%d %H:%M:%S")
-            point = int(point)
-        except ValueError:
-            messagebox.showerror("Invalid Input", "Please ensure that point is a valid integer.")
-            return
-        
-        result = self.task_manager.create_task(title, description, assigned_to, start_date, end_date, priority, point)
+       
+        result = self.task_manager.create_task(title, description, assigned_to, start_date_str, end_date_str, priority, point)
         messagebox.showinfo("Task Creation", result)
-
-        self.clear_form()
-
-        self.show_tasks()
+        if "successfully" in result:
+            self.show_tasks()
+            self.task_form.destroy()
 
     def clear_form(self):
-        self.title_entry.delete(0, tk.END)
-        self.desc_entry.delete(0, tk.END)
-        self.assigned_to_entry.delete(0, tk.END)
-        self.start_date_entry.delete(0, tk.END)
-        self.end_date_entry.delete(0, tk.END)
-        self.priority_entry.delete(0, tk.END)
-        self.point_entry.delete(0, tk.END)
+        self.create_entries["Tiêu Đề Công Việc:"].delete(0, tk.END)
+        self.create_entries["Mô Tả Công Việc:"].delete("1.0", "end-1c")
+        self.create_entries["Người Giao Công Việc (Email):"].delete(0, tk.END)
+        self.create_entries["Ngày Bắt Đầu:"].set_date('')
+        self.create_entries["Ngày Kết Thúc:"].set_date('')
+        self.create_entries["Mức Độ Ưu Tiên:"].delete(0, tk.END)
+        self.create_entries["Điểm Công Việc:"].delete(0, tk.END)
     def show_tasks(self):
         tasks = self.task_manager.show_tasks()
         for row in self.tree.get_children():
@@ -332,16 +326,17 @@ class TaskManagerUI:
             # Form layout
             form_frame = tk.Frame(self.task_form, bg="white")
             form_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
-
+            user_emails = self.user_manager.get_emails_by_role()
             # Fields definition with the data from the task to edit
             fields = [
                     ("Tiêu Đề Công Việc:", task_to_edit["title"], False, False, None),
                     ("Mô Tả Công Việc:", task_to_edit["description"], False, True, None),
                     ("Ngày Bắt Đầu:", task_to_edit["start_date"], False, True, None),
                     ("Ngày Kết Thúc:", task_to_edit["end_date"], False, True, None),
-                    ("Người Giao Công Việc (Email):", task_to_edit["assigned_to"], False, False, None),
+                    ("Người Giao Công Việc (Email):", task_to_edit["assigned_to"], True, False, user_emails),
                     ("Mức Độ Ưu Tiên:", task_to_edit["priority"], True, False, ["Low", "Medium", "High"]),
-                    ("Điểm Công Việc:", str(task_to_edit["point"]), False, False, None)
+                    ("Status:", task_to_edit["status"], True, False, ["Completed", "In Progress", "Pending","Done"]),
+                    ("Điểm Công Việc:", task_to_edit["point"], False, False, None)
                    ]
             self.edit_entries = {}
             for i, field in enumerate(fields):
@@ -351,13 +346,34 @@ class TaskManagerUI:
                 label = tk.Label(form_frame, text=label_text, font=("Arial", 12, "bold"), bg="white", anchor="w")
                 label.grid(row=i, column=0, sticky="w", padx=5, pady=5)
                 row = i
-                entry = create_form_input(form_frame, label_text, row, is_combobox=is_combobox, 
-                               values=values, is_date=is_date, is_text=is_text)
-                if is_combobox and values:
+                if label_text == "Điểm Công Việc:":
+                    entry = tk.Spinbox(form_frame, from_=0, to=10, increment=0.5, width=15)
+                    entry.grid(row=i, column=1, padx=10, pady=5, sticky="w")
+                    entry.delete(0, tk.END)
+                else:
+                    entry = create_form_input(form_frame, label_text, i,
+                                        is_combobox=is_combobox, values=values,
+                                        is_date=is_date, is_text=is_text)
+                if is_date:
+                    if isinstance(value, str):
+                        value = value.split(" ")[0] 
+                    try:
+                        date_obj = datetime.strptime(value, "%Y-%m-%d")
+                        formatted_date = date_obj.strftime("%m/%d/%Y")  # Format to MM/DD/YYYY
+                    except ValueError:
+                        formatted_date = value  # If it doesn't parse correctly, use the original value
+
+                    
+                    entry.set_date(date_obj)  # Set the date value using set_date()
+                elif is_combobox and values:
+                    print("combobox",value)
                     entry.set(value)
                 elif is_text:
+                    print("is_text",value)
                     entry.insert(tk.END, value)
                 if not is_combobox and not is_date and not is_text:
+                    print("end",value)
+                    entry.delete(0, tk.END)
                     entry.insert(0, value)  # Set the value for entry widgets
 
                 self.edit_entries[label_text] = entry
@@ -380,30 +396,22 @@ class TaskManagerUI:
         description = self.edit_entries["Mô Tả Công Việc:"].get("1.0", "end-1c")  # Get text area content
         assigned_to = self.edit_entries["Người Giao Công Việc (Email):"].get()
         start_date_str = self.edit_entries["Ngày Bắt Đầu:"].get_date()  # Get the date from the calendar widget
-        end_date_str = self.edit_entries["Ngày Kết Thúc:"].get_date()  # Get the date from the calendar widget
+        end_date_str = self.edit_entries["Ngày Kết Thúc:"].get_date() 
+        status = self.edit_entries["Status:"].get() # Get the date from the calendar widget
         priority = self.edit_entries["Mức Độ Ưu Tiên:"].get()
         point = self.edit_entries["Điểm Công Việc:"].get()
-
+        print(start_date_str,end_date_str)
         # Validating the input
         if not title or not description or not assigned_to or not start_date_str or not end_date_str or not priority or not point:
             messagebox.showerror("Missing Information", "All fields are required.")
             return
 
-        try:
-            start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
-            end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
-            point = int(point)
-        except ValueError:
-            messagebox.showerror("Invalid Input", "Please ensure that point is a valid integer and dates are correct.")
-            return
-
         # Update the task in task manager
-        self.task_manager.update_task(task_id, title, description, assigned_to, start_date, end_date, priority, point)
-        messagebox.showinfo("Task Update", "Task has been updated successfully.")
-
-        # Refresh the task list view and close the form
-        self.show_tasks()
-        self.task_form.destroy()
+        result=self.task_manager.update_task(task_id, title, description, assigned_to,status, start_date_str, end_date_str, priority, point)
+        messagebox.showinfo("Task Update", result)
+        if "successfully" in result:
+            self.show_tasks()
+            self.task_form.destroy()
     def delete_task(self, task_id):
         if messagebox.askyesno("Delete Task", "Are you sure you want to delete this task?"):
             self.task_manager.delete_task(task_id)

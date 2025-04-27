@@ -19,7 +19,7 @@ class LoginForm:
         self.frame.pack(fill="both", expand=True, padx=20, pady=20)
 
         self.create_widgets()
-        self.user_manager = UserManager()
+        self.user_manager = UserManager(None,None)
 
     def create_widgets(self):
         # Ô nhập email

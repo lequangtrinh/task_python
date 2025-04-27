@@ -176,3 +176,19 @@ class UserManager:
                     results.append(user)
 
         return results
+    def get_emails_by_role(self):
+        emails = []
+        if self.role == 'admin':
+            emails = [user['email'] for user in self.users.values()]
+        
+        # If the role is user, only load the email of the current user
+        elif self.role == 'user':
+            if self.user_email in self.users:
+                emails.append(self.user_email)
+        elif self.role == 'manage':
+            emails.append(self.user_email)
+
+            for email, user in self.users.items():
+                if user['role'] == 'user' and user['email'] != self.user_email:
+                    emails.append(email)
+        return emails

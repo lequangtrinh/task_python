@@ -191,21 +191,33 @@ class UserManagementUI:
             self.handle_action(values, email)
 
     def toggle_checkbox(self, email, item):
+        for t_id in self.checked_user:
+            self.checked_user[t_id] = False
+            self.update_checkbox_display(t_id)
         current_state = self.checked_user[email]
         new_state = not current_state
         self.checked_user[email] = new_state
+
         new_symbol = "☑" if new_state else "☐"
         new_values = list(self.tree.item(item, "values"))
         new_values[0] = new_symbol
         self.tree.item(item, values=new_values)
-
         if new_state:
-            self.edit_task(email)
-
+            self.edit_user(email)
+    def update_checkbox_display(self, task_id):
+        self.checked_user[task_id] = False
+        for item in self.tree.get_children():
+            values = self.tree.item(item, "values")
+            if str(values[1]) == str(task_id):
+                checkbox_display = "☑️" if self.checked_user.get(task_id, False) else "☐"
+                new_values = list(values)
+                new_values[0] = checkbox_display  
+                self.tree.item(item, values=new_values)
+                break
     def handle_action(self, values, email):
         actions = values[5]
         if "🗑️" in actions:
-            self.delete_task(email)
+            self.delete_user(email)
 
     def create_add_user_screen(self):
         """Giao diện thêm người dùng"""
@@ -233,5 +245,44 @@ class UserManagementUI:
 
         # Thêm người dùng vào cơ sở dữ liệu
         self.user_manager.add_user(email, role)
+        self.show_user()
+        self.clear_screen()
+    def delete_user(self, email):
+        print("delete user")
+    def edit_user(self, email):
+        user = self.user_manager.get_user_by_email(email)
+        if not user:
+            messagebox.showerror("Error", "Không tìm thấy người dùng.")
+            return
+
+        self.clear_screen()
+        self.edit_user_frame = tk.Frame(self.root, bg="#f4f4f9")
+        self.edit_user_frame.pack(padx=20, pady=20)
+
+        # Email should be uneditable, as the email is unique and should not be changed
+        tk.Label(self.edit_user_frame, text="Email:", font=("Arial", 12), bg="#f4f4f9").grid(row=0, column=0, sticky="w", padx=10, pady=5)
+        email_entry = tk.Entry(self.edit_user_frame, font=("Arial", 12), state="readonly")
+        email_entry.grid(row=0, column=1, padx=10, pady=5)
+        email_entry.insert(0, email)  # Pre-fill the email
+
+        # Role selection (combobox)
+        tk.Label(self.edit_user_frame, text="Vai trò:", font=("Arial", 12), bg="#f4f4f9").grid(row=1, column=0, sticky="w", padx=10, pady=5)
+        role_combobox = ttk.Combobox(self.edit_user_frame, values=["user", "admin", "manage"], font=("Arial", 12))
+        role_combobox.grid(row=1, column=1, padx=10, pady=5)
+        role_combobox.set(user['role'])  # Pre-fill the current role
+
+        # Submit button for saving the edited user
+        submit_button = tk.Button(self.edit_user_frame, text="Cập nhật", font=("Arial", 12), bg="#4CAF50", fg="white", command=lambda: self.submit_edit_user(email, role_combobox))
+        submit_button.grid(row=2, column=0, columnspan=2, pady=10)
+
+    def submit_edit_user(self, email, role_combobox):
+        """Lưu thay đổi sau khi chỉnh sửa người dùng"""
+        new_role = role_combobox.get().strip()
+        if not new_role:
+            messagebox.showerror("Error", "Vui lòng chọn vai trò.")
+            return
+
+        self.user_manager.edit_user(email, new_role)
+
         self.show_user()
         self.clear_screen()

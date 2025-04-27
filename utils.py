@@ -40,7 +40,6 @@ def format_date(date_str):
             return "Invalid date format"
     
     return date_obj.strftime("%d/%m/%Y")
-@staticmethod
 def create_form_input(parent, label_text, row, is_combobox=False, values=None, is_date=False, is_text=False):
     label = tk.Label(parent, text=label_text, font=("Arial", 12, "bold"), bg="#f4f4f9", anchor="w")
     label.grid(row=row, column=0, sticky="w", padx=10, pady=10)

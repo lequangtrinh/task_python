@@ -28,7 +28,13 @@ class TaskManager:
         except json.JSONDecodeError:
             print(f"Lỗi khi phân tích cú pháp JSON trong tệp {file_path}.")
             return None
-    
+    def save_tasks_to_file(self, file_path):
+        try:
+            with open(file_path, 'w', encoding='utf-8') as file:
+                json.dump({"tasks": self.tasks}, file, ensure_ascii=False, indent=4)
+            print(f"Tasks saved to {file_path}")
+        except Exception as e:
+            print(f"Error saving tasks: {e}")
     # Kiểm tra quyền người dùng khi tạo hoặc cập nhật task
     def check_role(self, assigned_to, task_id=None):
         if self.role == 'user':
@@ -53,14 +59,16 @@ class TaskManager:
 
     # Kiểm tra thời gian bắt đầu và kết thúc có hợp lệ không
     def check_dates(self, start_date, end_date, task_id=None):
+        print(end_date)
+        print(start_date)
         if (end_date - start_date) < timedelta(minutes=30):
             return "End date must be at least 30 minutes after start date."
         for task in self.tasks:
-            task_start_date = datetime.strptime(task["start_date"], "%Y-%m-%d %H:%M:%S")
-            task_end_date = datetime.strptime(task["end_date"], "%Y-%m-%d %H:%M:%S")
+            task_start_date = datetime.strptime(task["start_date"].split(" ")[0], "%Y-%m-%d")
+            task_end_date = datetime.strptime(task["end_date"].split(" ")[0], "%Y-%m-%d")
             if task_id and task["id"] == task_id:
                 continue
-            if start_date < task_end_date and end_date > task_start_date:
+            if start_date < task_end_date.date() and end_date > task_start_date.date():
                 return "There is already a task in the same time range, except for Active status tasks."
         return None
     
@@ -72,7 +80,6 @@ class TaskManager:
         date_check = self.check_dates(start_date, end_date)
         if date_check:
             return date_check
-        
         new_task = {
             "id": str(uuid.uuid4()),  # Unique ID
             "title": title,
@@ -90,6 +97,7 @@ class TaskManager:
             "point": point
         }
         self.tasks.append(new_task)
+        self.save_tasks_to_file("tasks.json")
         return f"Task '{title}' created successfully."
 
     # Cập nhật task
@@ -115,9 +123,9 @@ class TaskManager:
         if status:
             task_to_update["status"] = status
         if start_date:
-            task_to_update["start_date"] = start_date.strftime("%Y-%m-%d %H:%M:%S")
+            task_to_update["start_date"] = start_date
         if end_date:
-            task_to_update["end_date"] = end_date.strftime("%Y-%m-%d %H:%M:%S")
+            task_to_update["end_date"] = end_date
         if priority:
             task_to_update["priority"] = priority
         if point is not None:  # Cập nhật điểm nếu có
@@ -125,6 +133,7 @@ class TaskManager:
         
         task_to_update["updated_at"] = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
         task_to_update["updated_by"] = self.user_email
+        self.save_tasks_to_file("tasks.json")
         return "Task updated successfully!"
 
     # Xóa task
@@ -136,6 +145,7 @@ class TaskManager:
         if role_check:
             return role_check
         self.tasks = [task for task in self.tasks if task["id"] != task_id]
+        self.save_tasks_to_file("tasks.json")
         return f"Task with ID {task_id} has been deleted successfully."
 
     # Hiển thị task dựa trên role

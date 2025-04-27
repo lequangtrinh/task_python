@@ -10,7 +10,7 @@ class DashboardUI:
         self.master.title("Dashboard")
         self.master.state('zoomed')
         self.master.configure(bg="#f4f6f9")  # Màu nền sáng, dễ nhìn
-
+        self.root = master
         self.role = role
         self.user_email = user_email
 
@@ -36,7 +36,7 @@ class DashboardUI:
         self.frame_dashboard.grid(row=0, column=0, sticky="nsew", padx=20, pady=20)
 
         self.task_manager = TaskManager(self.user_email, self.role)
-        self.user_maneger = UserManager(self.user_email, self.role)
+        self.user_manager = UserManager(self.user_email, self.role)
         self.create_widgets()
 
     def create_widgets(self):
@@ -52,6 +52,14 @@ class DashboardUI:
             fg="white"
         )
         welcome_label.grid(row=0, column=0, pady=15)
+
+        # Thêm nút Logout và Close
+        logout_button = tk.Button(
+            title_frame, text="Logout", command=self.logout, 
+            font=("Helvetica", 12, "bold"), bg="#FF5733", fg="white", bd=0, padx=10
+        )
+        logout_button.grid(row=0, column=1, padx=10, pady=15)
+
 
         # Initialize TabControl widget here
         self.tab_control = ttk.Notebook(self.frame_dashboard)
@@ -72,7 +80,8 @@ class DashboardUI:
         # Label hiển thị người dùng
         show_user_label = tk.Label(show_user_tab, text="Thông tin người dùng", font=("Arial", 14), bg="#f4f6f9")
         show_user_label.grid(row=1, column=0, pady=20, padx=10)
-        user_manager_ui = UserManagementUI(show_user_tab, role=self.role, user_email=self.user_email, user_manager=self.user_maneger)
+        user_manager_ui = UserManagementUI(show_user_tab, role=self.role, user_email=self.user_email, user_manager=self.user_manager)
+
         # Tab Báo cáo (Có thể dành cho tất cả)
         report_tab = ttk.Frame(self.tab_control, style="TFrame")  # Sử dụng style
         self.tab_control.add(report_tab, text=f"📊 Báo cáo", padding=[20, 10])
@@ -92,8 +101,15 @@ class DashboardUI:
         footer_label = tk.Label(footer_frame, text="Được phát triển bởi Team X", font=("Arial", 10), bg="#f4f6f9", fg="#999999")
         footer_label.grid(row=0, column=0, pady=5)
 
-# Hàm chạy ứng dụng
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = DashboardUI(root, role="admin", user_email="leherhe@gmai.com")
-    root.mainloop()
+    def logout(self):
+        self.tab_control.select(0)
+        for widget in self.tab_control.winfo_children():
+            widget.destroy()
+        self.master.withdraw()
+        from application_ui import Application
+        root = tk.Tk()
+        app = Application(root)
+        root.mainloop()
+
+
+
