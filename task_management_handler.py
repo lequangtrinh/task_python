@@ -123,9 +123,9 @@ class TaskManager:
         if status:
             task_to_update["status"] = status
         if start_date:
-            task_to_update["start_date"] = start_date
+            task_to_update["start_date"] = start_date.strftime("%Y-%m-%d %H:%M:%S")
         if end_date:
-            task_to_update["end_date"] = end_date
+            task_to_update["end_date"] = end_date.strftime("%Y-%m-%d %H:%M:%S")
         if priority:
             task_to_update["priority"] = priority
         if point is not None:  # Cập nhật điểm nếu có
