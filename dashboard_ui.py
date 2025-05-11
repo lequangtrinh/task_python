@@ -69,7 +69,6 @@ class DashboardUI:
         self.tab_control.add(task_management_tab, text=f"📝 Quản lý công việc", padding=[20, 10])
         task_management_label = tk.Label(task_management_tab, text="Quản lý công việc", font=("Arial", 14), bg="#f4f6f9")
         task_management_label.grid(row=0, column=0, pady=20)
-
         # Tạo TaskManagerUI trong Tab Quản lý công việc
         task_manager_ui = TaskManagerUI(task_management_tab, role=self.role, user_email=self.user_email, task_manager=self.task_manager)
 

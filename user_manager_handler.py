@@ -12,11 +12,10 @@ class UserManager:
     def __init__(self, user_email,role):
         self.user_email = user_email
         self.role = role
-        self.user_file = "users.json"
+        self.user_file =os.path.join(os.path.dirname(os.path.abspath(__file__)), "users.json")
         self.users = self.load_users()
 
     def load_users(self):
-        """Tải danh sách người dùng từ file"""
         if not os.path.exists(self.user_file):
             return {}
         with open(self.user_file, 'r', encoding='utf-8') as f:
@@ -44,7 +43,6 @@ class UserManager:
             json.dump({"data": list(self.users.values())}, f, indent=4)
 
     def check_email_exists(self, email):
-        """Kiểm tra email có tồn tại trong hệ thống hay không"""
         return email in self.users
 
     def register(self, username, password, email, role='user', gender='Male'):

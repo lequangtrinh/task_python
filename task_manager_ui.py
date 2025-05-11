@@ -3,7 +3,8 @@ from tkinter import ttk,messagebox
 from datetime import datetime
 from tkcalendar import DateEntry
 from user_manager_handler import UserManager
-from utils import format_date, create_form_input,on_button_hover,on_button_leave
+import customtkinter as ctk
+from utils import format_date, create_form_input
 class TaskManagerUI:
     def __init__(self, parent, role, user_email, task_manager):
         self.checked_tasks = {}
@@ -44,10 +45,10 @@ class TaskManagerUI:
         self.search_entry = tk.Entry(left_frame, textvariable=self.search_var, font=("Arial", 12), width=30)
         self.search_entry.grid(row=0, column=0, padx=(0, 5))
 
-        search_button = tk.Button(
-            left_frame, text="Search", command=self.search_tasks,
-            font=("Arial", 12), bg="#2196F3", fg="white", relief="flat", cursor="hand2"
-        )
+        search_button = ctk.CTkButton(
+                    left_frame, text="🔍 Search", command=self.search_tasks,
+                    font=ctk.CTkFont(size=12, weight="bold"), bg_color="#2196F3", fg_color="#4CAF50", border_width=0, corner_radius=8, cursor="hand2"
+                )
         search_button.grid(row=0, column=1)
 
         self.search_entry.bind("<Return>", lambda event: self.search_tasks())  # Optional: Enter to search
@@ -56,19 +57,24 @@ class TaskManagerUI:
         right_frame = tk.Frame(controls_frame, bg="#f7f7f7")
         right_frame.grid(row=0, column=1, sticky="e")
 
-        self.create_button = tk.Button(
-            right_frame, text="Create Task", command=self.show_create_task_form,
-            font=("Arial", 12, "bold"), bg="#4CAF50", fg="white", width=20,
-            relief="flat", cursor="hand2"
+        self.create_button =ctk.CTkButton(
+            right_frame, text="➕ Create Task", command=self.show_create_task_form,
+            font=ctk.CTkFont(size=12, weight="bold"), fg_color="#4CAF50", width=200
         )
         self.create_button.grid(row=0, column=0)
 
-        self.create_button.bind("<Enter>", on_button_hover)
-        self.create_button.bind("<Leave>", on_button_leave)
+        self.create_button.bind("<Enter>", self.on_button_hover)
+        self.create_button.bind("<Leave>", self.on_button_leave)
 
         # Show task list
         self.show_tasks_content(main_frame)
+    def on_button_hover(self, event):
+        # Chuyển màu khi chuột di vào nút
+        self.create_button.configure(fg_color="#81C784")
 
+    def on_button_leave(self, event):
+        # Chuyển màu khi chuột rời khỏi nút
+        self.create_button.configure(fg_color="#4CAF50")
     def show_tasks_content(self, parent):
         self.tree_frame = tk.Frame(parent, bg="#f7f7f7")
         self.tree_frame.grid(row=2, column=0, pady=20, sticky="nsew")
@@ -129,58 +135,61 @@ class TaskManagerUI:
         self.task_form.title("Tạo Công Việc Mới")
         self.task_form.geometry("700x500")
         self.task_form.config(bg="#ffffff")
-
-        form_frame = tk.Frame(self.task_form, bg="white")
+        form_frame = ctk.CTkFrame(self.task_form, bg_color="white")  # Sử dụng CTkFrame thay cho tk.Frame
         form_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+
         user_emails = self.user_manager.get_emails_by_role()
+        self.create_entries = {}
         # Danh sách trường nhập
         fields = [
-            ("Tiêu Đề Công Việc:", "", False, False, None),
+            ("Tiêu Đề Công Việc:", "", False, True, None),
             ("Mô Tả Công Việc:", "", False, True, None),
             ("Ngày Bắt Đầu:", "", False, True, None),
             ("Ngày Kết Thúc:", "", False, True, None),
-            ("Người Giao Công Việc (Email):", "", True, False,  user_emails),
+            ("Người Giao Công Việc (Email):", "", True, False, user_emails),
             ("Mức Độ Ưu Tiên:", "", True, False, ["Cao", "Trung Bình", "Thấp"]),
             ("Điểm Công Việc:", "", False, False, None)
         ]
 
-        self.create_entries = {}
-
         for i, field in enumerate(fields):
             label_text, value, is_combobox, is_text = field[:4]
-            values = field[4] if len(field) > 4 else None 
+            values = field[4] if len(field) > 4 else None
             is_date = ("Ngày Bắt Đầu" in label_text or "Ngày Kết Thúc" in label_text)
 
-            label = tk.Label(form_frame, text=label_text, font=("Arial", 12, "bold"), bg="white", anchor="w")
+            label = ctk.CTkLabel(form_frame, text=label_text, font=("Arial", 12, "bold"), bg_color="white", anchor="w")
             label.grid(row=i, column=0, sticky="w", padx=10, pady=5)
 
             if label_text == "Điểm Công Việc:":
-                entry = tk.Spinbox(form_frame, from_=0, to=10, increment=0.5,width=15) 
+                validate_command = (self.root.register(self.validate_input), "%P")
+                entry = ctk.CTkEntry(form_frame, font=("Arial", 12), width=70)
                 entry.grid(row=i, column=1, padx=10, pady=5, sticky="w")
             else:
                 entry = create_form_input(form_frame, label_text, i,
-                                    is_combobox=is_combobox, values=values,
-                                    is_date=is_date, is_text=is_text)
+                                        is_combobox=is_combobox, values=values,
+                                        is_date=is_date, is_text=is_text)
 
             self.create_entries[label_text] = entry
 
         # Buttons
-        button_frame = tk.Frame(form_frame, bg="white")
-        button_frame.grid(row=len(fields) + 1, column=0, columnspan=2, pady=20)
+        button_frame = ctk.CTkFrame(form_frame, bg_color="white")
+        button_frame.grid(row=len(fields), column=0, columnspan=2, pady=20)
 
-        save_btn = tk.Button(button_frame, text="💾 Lưu", font=("Arial", 12, "bold"),
-                            bg="#4CAF50", fg="white", padx=20, command=self.create_task)
-        save_btn.pack(side="left", padx=10)
+        save_btn = ctk.CTkButton(button_frame, text="💾 Lưu", font=("Arial", 12, "bold"),
+                                fg_color="#4CAF50", bg_color="#4CAF50", width=150, height=40, command=self.create_task)
+        save_btn.grid(row=0, column=0, padx=10, pady=10)  # Dùng grid thay vì pack
 
-        cancel_btn = tk.Button(button_frame, text="❌ Hủy", font=("Arial", 12, "bold"),
-                            bg="#F44336", fg="white", padx=20, command=self.task_form.destroy)
-        cancel_btn.pack(side="left", padx=10)
-  
+        cancel_btn = ctk.CTkButton(button_frame, text="❌ Hủy", font=("Arial", 12, "bold"),
+                                fg_color="red", bg_color="#4CAF50", width=150, height=40, command=self.task_form.destroy)
+        cancel_btn.grid(row=0, column=1, padx=10, pady=10)
+    def validate_input(self, input_value):
+        if input_value == "" or input_value.isdigit():
+            return True
+        return False
     def on_focus_in(self, event):
-        event.widget.config(bg="#e0f7fa")
+        event.widget.config(bg_color="#e0f7fa")
 
     def on_focus_out(self, event):
-        event.widget.config(bg="white")
+        event.widget.config(bg_color="white")
 
     def create_task(self):
         title = self.create_entries["Tiêu Đề Công Việc:"].get()
@@ -324,10 +333,9 @@ class TaskManagerUI:
             self.task_form.config(bg="#ffffff")
 
             # Form layout
-            form_frame = tk.Frame(self.task_form, bg="white")
+            form_frame = ctk.CTkFrame(self.task_form, bg_color="white")  # Sử dụng CTkFrame thay cho tk.Frame
             form_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
             user_emails = self.user_manager.get_emails_by_role()
-            # Fields definition with the data from the task to edit
             fields = [
                     ("Tiêu Đề Công Việc:", task_to_edit["title"], False, False, None),
                     ("Mô Tả Công Việc:", task_to_edit["description"], False, True, None),
@@ -337,59 +345,56 @@ class TaskManagerUI:
                     ("Mức Độ Ưu Tiên:", task_to_edit["priority"], True, False, ["Low", "Medium", "High"]),
                     ("Status:", task_to_edit["status"], True, False, ["Completed", "In Progress", "Pending","Done"]),
                     ("Điểm Công Việc:", task_to_edit["point"], False, False, None)
-                   ]
+                ]
             self.edit_entries = {}
             for i, field in enumerate(fields):
                 label_text, value, is_combobox, is_text = field[:4]
                 values = field[4] if len(field) > 4 else None 
                 is_date = ("Ngày Bắt Đầu" in label_text or "Ngày Kết Thúc" in label_text)
-                label = tk.Label(form_frame, text=label_text, font=("Arial", 12, "bold"), bg="white", anchor="w")
+                label = ctk.CTkLabel(form_frame, text=label_text, font=("Arial", 12, "bold"), bg_color="white", anchor="w")
                 label.grid(row=i, column=0, sticky="w", padx=5, pady=5)
                 row = i
                 if label_text == "Điểm Công Việc:":
-                    entry = tk.Spinbox(form_frame, from_=0, to=10, increment=0.5, width=15)
+                    # Chỉ cho phép nhập số
+                    validate_command = (self.root.register(self.validate_input), "%P")
+                    entry = ctk.CTkEntry(form_frame, font=("Arial", 12), width=70, validate="key", validatecommand=validate_command)
                     entry.grid(row=i, column=1, padx=10, pady=5, sticky="w")
                     entry.delete(0, tk.END)
                 else:
                     entry = create_form_input(form_frame, label_text, i,
-                                        is_combobox=is_combobox, values=values,
-                                        is_date=is_date, is_text=is_text)
+                                            is_combobox=is_combobox, values=values,
+                                            is_date=is_date, is_text=is_text)
                 if is_date:
                     if isinstance(value, str):
-                        value = value.split(" ")[0] 
+                        value = value.split(" ")[0]  # Format to only the date part if it has time
                     try:
                         date_obj = datetime.strptime(value, "%Y-%m-%d")
                         formatted_date = date_obj.strftime("%m/%d/%Y")  # Format to MM/DD/YYYY
                     except ValueError:
                         formatted_date = value  # If it doesn't parse correctly, use the original value
 
-                    
                     entry.set_date(date_obj)  # Set the date value using set_date()
                 elif is_combobox and values:
-                    print("combobox",value)
                     entry.set(value)
                 elif is_text:
-                    print("is_text",value)
                     entry.insert(tk.END, value)
                 if not is_combobox and not is_date and not is_text:
-                    print("end",value)
                     entry.delete(0, tk.END)
                     entry.insert(0, value)  # Set the value for entry widgets
 
                 self.edit_entries[label_text] = entry
 
             # Buttons (Lưu, Hủy)
-            button_frame = tk.Frame(form_frame, bg="white")
+            button_frame = ctk.CTkFrame(form_frame, bg_color="white")
             button_frame.grid(row=len(fields) + 1, column=0, columnspan=2, pady=20)
 
-            save_btn = tk.Button(button_frame, text="💾 Lưu", font=("Arial", 12, "bold"),
-                                bg="#4CAF50", fg="white", padx=20, command=lambda: self.update_task(task_id))
-            save_btn.pack(side="left", padx=10)
+            save_btn = ctk.CTkButton(button_frame, text="💾 Lưu", font=("Arial", 12, "bold"),
+                                    fg_color="#4CAF50", bg_color="#4CAF50", width=150, height=40, command=lambda: self.update_task(task_id))
+            save_btn.grid(row=0, column=0, padx=10, pady=10)  # Dùng grid thay vì pack
 
-            cancel_btn = tk.Button(button_frame, text="❌ Hủy", font=("Arial", 12, "bold"),
-                                bg="#F44336", fg="white", padx=20, command=self.task_form.destroy)
-            cancel_btn.pack(side="left", padx=10)
-
+            cancel_btn = ctk.CTkButton(button_frame, text="❌ Hủy", font=("Arial", 12, "bold"),
+                                        fg_color="red", bg_color="#4CAF50", width=150, height=40, command=self.task_form.destroy)
+            cancel_btn.grid(row=0, column=1, padx=10, pady=10)
     def update_task(self, task_id):
         # Retrieving form input values
         title = self.edit_entries["Tiêu Đề Công Việc:"].get()
