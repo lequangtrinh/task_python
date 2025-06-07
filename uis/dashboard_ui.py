@@ -1,4 +1,5 @@
 import customtkinter as ctk
+from tkinter import messagebox
 from uis.task_manager_ui import TaskManagerUI
 from handler.task_management_handler import TaskManager
 from uis.user_management_ui import UserManagementUI
@@ -23,15 +24,18 @@ class DashboardUI:
 
         self.frame_dashboard = ctk.CTkFrame(self.master, fg_color="#f4f6f9")
         self.frame_dashboard.grid(row=0, column=0, sticky="nsew", padx=20, pady=20)
-
+      
         # Cấu hình grid stretch
         self.master.grid_rowconfigure(0, weight=1)
         self.master.grid_columnconfigure(0, weight=1)
         self.frame_dashboard.grid_rowconfigure(1, weight=1)
         self.frame_dashboard.grid_columnconfigure(1, weight=1)
-
+        
         self.create_widgets()
-
+    def on_close(self):
+        print("on_close triggered")
+        if messagebox.askokcancel("Thoát", "Bạn có chắc muốn đóng cửa sổ?"):
+            self.master.destroy()
     def create_widgets(self):
         # Title bar
         title_frame = ctk.CTkFrame(self.frame_dashboard, fg_color="#4CAF50", height=80)

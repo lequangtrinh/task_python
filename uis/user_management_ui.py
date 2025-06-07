@@ -1,7 +1,5 @@
 import customtkinter as ctk
 from tkinter import ttk, messagebox
-from tkcalendar import DateEntry
-from commons.utils import format_date, create_form_input, on_button_hover, on_button_leave
 
 class UserManagementUI:
     def __init__(self, parent, role, user_email, user_manager):
@@ -13,6 +11,7 @@ class UserManagementUI:
         if isinstance(self.root, ctk.CTk):
             self.root.title("Quản lý Người Dùng")
             self.root.state('zoomed')
+            self.root.configure(fg_color="#e8eaf6")
         self.create_widgets()
 
     def create_widgets(self):
@@ -24,62 +23,113 @@ class UserManagementUI:
         self.create_user_management_content(main_frame)
 
     def create_main_frame(self):
-        main_frame = ctk.CTkFrame(self.root, fg_color="#f7f7f7")
-        main_frame.grid(row=0, column=0, sticky="nsew", padx=20, pady=20)
+        main_frame = ctk.CTkFrame(self.root, fg_color="#f5f7ff", corner_radius=12)
+        main_frame.grid(row=0, column=0, sticky="nsew", padx=30, pady=20)
         main_frame.grid_columnconfigure(0, weight=1)
         return main_frame
 
     def create_title_label(self, parent):
         title_label = ctk.CTkLabel(
-            parent, text="Quản lý Người Dùng", font=ctk.CTkFont(size=24, weight="bold")
+            parent,
+            text="Quản lý Người Dùng",
+            font=ctk.CTkFont(size=28, weight="bold"),
+            text_color="#344055",
+            pady=15
         )
-        title_label.grid(row=0, column=0, pady=(0, 20), sticky="n")
+        title_label.grid(row=0, column=0, pady=(0, 25), sticky="n")
 
     def create_controls_frame(self, parent):
-        controls_frame = ctk.CTkFrame(parent, fg_color="#f7f7f7")
-        controls_frame.grid(row=1, column=0, sticky="ew", pady=(0, 10))
+        controls_frame = ctk.CTkFrame(parent, fg_color="#f5f7ff")
+        controls_frame.grid(row=1, column=0, sticky="ew", pady=(0, 15))
         controls_frame.grid_columnconfigure(0, weight=1)
-        controls_frame.grid_columnconfigure(1, weight=1)
+        controls_frame.grid_columnconfigure(1, weight=0)
         return controls_frame
 
     def create_search_widgets(self, parent):
-        left_frame = ctk.CTkFrame(parent, fg_color="#f7f7f7")
-        left_frame.grid(row=0, column=0, sticky="w", padx=(0, 50))
+        left_frame = ctk.CTkFrame(parent, fg_color="#f5f7ff")
+        left_frame.grid(row=0, column=0, sticky="w", padx=(0, 40))
 
         self.search_var = ctk.StringVar()
         self.search_entry = ctk.CTkEntry(
-            left_frame, textvariable=self.search_var, font=ctk.CTkFont(size=12), width=300,
-            placeholder_text="Nhập từ khóa tìm kiếm"
+            left_frame,
+            textvariable=self.search_var,
+            font=ctk.CTkFont(size=13),
+            width=320,
+            placeholder_text="Nhập từ khóa tìm kiếm",
+            corner_radius=8,
+            border_width=1,
+            border_color="#b0bec5",
+            fg_color="white",
+            height=32
         )
-        self.search_entry.grid(row=0, column=0, padx=(0, 5), pady=5)
+        self.search_entry.grid(row=0, column=0, padx=(0, 8), pady=8)
 
         search_button = ctk.CTkButton(
-            left_frame, text="🔍 Search", command=self.search_users,
-            font=ctk.CTkFont(size=12, weight="bold"), fg_color="#2196F3"
+            left_frame,
+            text="🔍 Tìm kiếm",
+            command=self.search_users,
+            font=ctk.CTkFont(size=13, weight="bold"),
+            fg_color="#1e88e5",
+            hover_color="#1565c0",
+            width=110,
+            height=32
         )
-        search_button.grid(row=0, column=1, pady=5)
+        search_button.grid(row=0, column=1, pady=8)
 
         self.search_entry.bind("<Return>", lambda event: self.search_users())
 
     def create_create_user_button(self, parent):
-        right_frame = ctk.CTkFrame(parent, fg_color="#f7f7f7")
+        right_frame = ctk.CTkFrame(parent, fg_color="#f5f7ff")
         right_frame.grid(row=0, column=1, sticky="e")
 
         self.create_button = ctk.CTkButton(
-            right_frame, text="➕ Create User", command=self.create_add_user_screen,
-            font=ctk.CTkFont(size=12, weight="bold"), fg_color="#4CAF50", width=200
+            right_frame,
+            text="➕ Tạo người dùng",
+            command=self.create_add_user_screen,
+            font=ctk.CTkFont(size=13, weight="bold"),
+            fg_color="#43a047",
+            hover_color="#2e7d32",
+            width=160,
+            height=32
         )
-        self.create_button.grid(row=0, column=0, pady=5)
+        self.create_button.grid(row=0, column=0, pady=8)
 
     def create_user_management_content(self, parent):
-        self.tree_frame = ctk.CTkFrame(parent, fg_color="#f7f7f7")
+        self.tree_frame = ctk.CTkFrame(parent, fg_color="#f5f7ff", corner_radius=12)
         self.tree_frame.grid(row=2, column=0, pady=20, sticky="nsew")
-        self.tree = ttk.Treeview(self.tree_frame, columns=("Select", "Email", "Gender", "User Name", "Role", "Status", "Actions"), show="headings", height=8)
+        self.tree_frame.grid_rowconfigure(0, weight=1)
+        self.tree_frame.grid_columnconfigure(0, weight=1)
+
+        style = ttk.Style()
+        style.theme_use('clam')
+        style.configure("Treeview",
+                        background="#ffffff",
+                        foreground="#344055",
+                        rowheight=30,
+                        fieldbackground="#f5f7ff",
+                        font=('Segoe UI', 11))
+        style.map('Treeview', background=[('selected', '#90caf9')])
+
+        self.tree = ttk.Treeview(
+            self.tree_frame,
+            columns=("Select", "Email", "Gender", "User Name", "Role", "Status", "Actions"),
+            show="headings",
+            height=9
+        )
         self.tree.grid(row=0, column=0, sticky="nsew")
 
-        for col in ("Select", "Email", "Gender", "User Name", "Role", "Status", "Actions"):
+        headings = {
+            "Select": 50,
+            "Email": 220,
+            "Gender": 120,
+            "User Name": 180,
+            "Role": 90,
+            "Status": 90,
+            "Actions": 80
+        }
+        for col, width in headings.items():
             self.tree.heading(col, text=col)
-            self.tree.column(col, anchor="center")
+            self.tree.column(col, width=width, anchor="center" if col in ["Select", "Actions"] else "w")
 
         scrollbar = ttk.Scrollbar(self.tree_frame, orient="vertical", command=self.tree.yview)
         scrollbar.grid(row=0, column=1, sticky="ns")
@@ -88,6 +138,9 @@ class UserManagementUI:
 
     def search_users(self):
         keyword = self.search_var.get().lower().strip()
+        if not keyword:
+            self.show_user()
+            return
         filtered_users = self.user_manager.search_user(keyword)
         self.clear_treeview()
         if filtered_users:
@@ -101,12 +154,21 @@ class UserManagementUI:
             self.display_users_in_treeview(filtered)
 
     def display_users_in_treeview(self, users):
-        for i, (email, user) in enumerate(users.items() if isinstance(users, dict) else users):
-            status = "Active" if user['active'] else "Inactive"
+        self.checked_user = {}
+
+        if isinstance(users, dict):
+            users = list(users.values())
+
+        for i, user in enumerate(users):
+            email = user.get("email", f"unknown_{i}")
+            status = "Active" if user.get("active") else "Inactive"
             checkbox = "☐"
             self.checked_user[email] = False
             action = "🗑️" if self.role == "admin" else "👁️"
-            self.tree.insert("", "end", values=(checkbox, email, user['gender'], user['username'], user['role'], status, action))
+            self.tree.insert("", "end", values=(
+                checkbox, email, user.get('gender', ''), user.get('username', ''), user.get('role', ''), status, action
+            ))
+
         self.tree.bind("<ButtonRelease-1>", self.on_tree_click)
 
     def clear_treeview(self):
@@ -157,84 +219,136 @@ class UserManagementUI:
     def create_add_user_screen(self):
         popup = ctk.CTkToplevel(self.root)
         popup.title("Thêm Người Dùng")
-        popup.geometry("400x350")
-        popup.grab_set()  # Khóa focus popup, modal
+        popup.geometry("500x350")
+        popup.grab_set()
+        popup.configure(fg_color="#f5f7ff")
 
-        self.add_user_email_entry = create_form_input(popup, "Email:", 0)
-        self.add_user_username_entry = create_form_input(popup, "Tên người dùng:", 1)
-        self.add_user_gender_combobox = create_form_input(popup, "Giới tính:", 2, is_combobox=True, values=["Male", "Female", "Other"])
-        self.add_user_role_combobox = create_form_input(popup, "Vai trò:", 3, is_combobox=True, values=["user", "admin", "manage"])
+        # Các label + input
+        ctk.CTkLabel(popup, text="Email:", font=ctk.CTkFont(size=13)).grid(row=0, column=0, padx=15, pady=12, sticky="w")
+        self.add_user_email_entry = ctk.CTkEntry(popup, width=280, font=ctk.CTkFont(size=12))
+        self.add_user_email_entry.grid(row=0, column=1, pady=12, sticky="ew")
 
-        def submit_add():
-            email = self.add_user_email_entry.get().strip()
-            username = self.add_user_username_entry.get().strip()
-            gender = self.add_user_gender_combobox.get().strip()
-            role = self.add_user_role_combobox.get().strip()
+        ctk.CTkLabel(popup, text="Tên người dùng:", font=ctk.CTkFont(size=13)).grid(row=1, column=0, padx=15, pady=12, sticky="w")
+        self.add_user_username_entry = ctk.CTkEntry(popup, width=280, font=ctk.CTkFont(size=12))
+        self.add_user_username_entry.grid(row=1, column=1, pady=12, sticky="ew")
 
-            if not email or not username or not  gender or not role:
-                messagebox.showerror("Error", "Vui lòng nhập đầy đủ thông tin.")
-                return
-            success = self.user_manager.register(email, username, email, gender, role)
-            if success:
-                messagebox.showinfo("Success", "Thêm người dùng thành công.")
-                popup.destroy()
-                self.show_user()
-            else:
-                messagebox.showerror("Error", "Thêm người dùng thất bại. Email có thể đã tồn tại.")
+        ctk.CTkLabel(popup, text="Giới tính:", font=ctk.CTkFont(size=13)).grid(row=2, column=0, padx=15, pady=12, sticky="w")
+        self.add_user_gender_var = ctk.StringVar(value="Nam")
+        gender_option = ctk.CTkOptionMenu(popup, values=["Nam", "Nữ", "Khác"], variable=self.add_user_gender_var, width=150)
+        gender_option.grid(row=2, column=1, pady=12, sticky="ew")
 
-        ctk.CTkButton(popup, text="Thêm", command=submit_add).grid(row=5, column=0, columnspan=2, pady=10)
+        ctk.CTkLabel(popup, text="Quyền:", font=ctk.CTkFont(size=13)).grid(row=3, column=0, padx=15, pady=12, sticky="w")
+        self.add_user_role_var = ctk.StringVar(value="user")
+        role_option = ctk.CTkOptionMenu(popup, values=["admin", "user"], variable=self.add_user_role_var, width=150)
+        role_option.grid(row=3, column=1, pady=12, sticky="ew")
+
+        active_var = ctk.BooleanVar(value=True)
+        self.add_user_active_check = ctk.CTkCheckBox(popup, text="Kích hoạt", variable=active_var)
+        self.add_user_active_check.grid(row=4, column=1, sticky="w", padx=15, pady=10)
+
+        btn_frame = ctk.CTkFrame(popup, fg_color="#f5f7ff")
+        btn_frame.grid(row=5, column=0, columnspan=2, pady=20)
+
+        submit_btn = ctk.CTkButton(btn_frame, text="Thêm", width=120, command=lambda: self.add_user(popup))
+        submit_btn.grid(row=0, column=0, padx=15)
+
+        cancel_btn = ctk.CTkButton(btn_frame, text="Hủy", width=120, fg_color="#e53935", hover_color="#b71c1c", command=popup.destroy)
+        cancel_btn.grid(row=0, column=1, padx=15)
+
+    def add_user(self, popup):
+        email = self.add_user_email_entry.get().strip()
+        username = self.add_user_username_entry.get().strip()
+        gender = self.add_user_gender_var.get()
+        role = self.add_user_role_var.get()
+        active = self.add_user_active_check.get()
+
+        if not email or not username:
+            messagebox.showwarning("Thiếu thông tin", "Vui lòng nhập đầy đủ Email và Tên người dùng.")
+            return
+
+        success = self.user_manager.add_user(email, {
+            "email": email,
+            "username": username,
+            "gender": gender,
+            "role": role,
+            "active": active
+        })
+        if success:
+            messagebox.showinfo("Thành công", "Thêm người dùng thành công.")
+            popup.destroy()
+            self.show_user()
+        else:
+            messagebox.showerror("Lỗi", "Email đã tồn tại hoặc không thể thêm người dùng.")
 
     def edit_user(self, email):
         user = self.user_manager.get_user_by_email(email)
         if not user:
-            messagebox.showerror("Error", "Không tìm thấy người dùng.")
+            messagebox.showerror("Lỗi", "Người dùng không tồn tại.")
             return
 
         popup = ctk.CTkToplevel(self.root)
-        popup.title(f"Sửa Người Dùng: {email}")
-        popup.geometry("400x300")
-        popup.grab_set()  # modal
+        popup.title(f"Sửa Người Dùng - {email}")
+        popup.geometry("500x350")
+        popup.grab_set()
+        popup.configure(fg_color="#f5f7ff")
 
-        ctk.CTkLabel(popup, text="Tên người dùng:").grid(row=0, column=0, padx=10, pady=5)
-        username_entry = ctk.CTkEntry(popup)
-        username_entry.grid(row=0, column=1, padx=10, pady=5)
-        username_entry.insert(0, user['username'])
+        ctk.CTkLabel(popup, text="Tên người dùng:", font=ctk.CTkFont(size=13)).grid(row=1, column=0, padx=15, pady=12, sticky="w")
+        self.edit_user_username_entry = ctk.CTkEntry(popup, width=280, font=ctk.CTkFont(size=12))
+        self.edit_user_username_entry.insert(0, user.get("username", ""))
+        self.edit_user_username_entry.grid(row=1, column=1, pady=12, sticky="ew")
 
-        ctk.CTkLabel(popup, text="Giới tính:").grid(row=1, column=0, padx=10, pady=5)
-        gender_cb = ctk.CTkComboBox(popup, values=["Male", "Female", "Other"])
-        gender_cb.grid(row=1, column=1, padx=10, pady=5)
-        gender_cb.set(user['gender'])
+        ctk.CTkLabel(popup, text="Giới tính:", font=ctk.CTkFont(size=13)).grid(row=2, column=0, padx=15, pady=12, sticky="w")
+        self.edit_user_gender_var = ctk.StringVar(value=user.get("gender", "Nam"))
+        gender_option = ctk.CTkOptionMenu(popup, values=["Nam", "Nữ", "Khác"], variable=self.edit_user_gender_var, width=150)
+        gender_option.grid(row=2, column=1, pady=12, sticky="ew")
 
-        ctk.CTkLabel(popup, text="Vai trò:").grid(row=2, column=0, padx=10, pady=5)
-        role_cb = ctk.CTkComboBox(popup, values=["user", "admin", "manage"])
-        role_cb.grid(row=2, column=1, padx=10, pady=5)
-        role_cb.set(user['role'])
+        ctk.CTkLabel(popup, text="Quyền:", font=ctk.CTkFont(size=13)).grid(row=3, column=0, padx=15, pady=12, sticky="w")
+        self.edit_user_role_var = ctk.StringVar(value=user.get("role", "user"))
+        role_option = ctk.CTkOptionMenu(popup, values=["admin", "user"], variable=self.edit_user_role_var, width=150)
+        role_option.grid(row=3, column=1, pady=12, sticky="ew")
 
-        def submit_edit():
-            new_username = username_entry.get().strip()
-            new_gender = gender_cb.get().strip()
-            new_role = role_cb.get().strip()
+        active_var = ctk.BooleanVar(value=user.get("active", True))
+        self.edit_user_active_check = ctk.CTkCheckBox(popup, text="Kích hoạt", variable=active_var)
+        self.edit_user_active_check.grid(row=4, column=1, sticky="w", padx=15, pady=10)
 
-            if not new_username or not new_gender or not new_role:
-                messagebox.showerror("Error", "Vui lòng điền đầy đủ thông tin.")
-                return
+        btn_frame = ctk.CTkFrame(popup, fg_color="#f5f7ff")
+        btn_frame.grid(row=5, column=0, columnspan=2, pady=20)
 
-            success = self.user_manager.edit_user(email, new_username, new_gender, new_role)
-            if success:
-                messagebox.showinfo("Success", "Cập nhật người dùng thành công.")
-                popup.destroy()
-                self.show_user()
-            else:
-                messagebox.showerror("Error", "Cập nhật người dùng thất bại.")
+        submit_btn = ctk.CTkButton(btn_frame, text="Lưu", width=120, command=lambda: self.save_user_edit(popup, email))
+        submit_btn.grid(row=0, column=0, padx=15)
 
-        ctk.CTkButton(popup, text="Cập nhật", command=submit_edit).grid(row=3, column=0, columnspan=2, pady=10)
+        cancel_btn = ctk.CTkButton(btn_frame, text="Hủy", width=120, fg_color="#e53935", hover_color="#b71c1c", command=popup.destroy)
+        cancel_btn.grid(row=0, column=1, padx=15)
+
+    def save_user_edit(self, popup, email):
+        username = self.edit_user_username_entry.get().strip()
+        gender = self.edit_user_gender_var.get()
+        role = self.edit_user_role_var.get()
+        active = self.edit_user_active_check.get()
+
+        if not username:
+            messagebox.showwarning("Thiếu thông tin", "Tên người dùng không được để trống.")
+            return
+
+        success = self.user_manager.update_user(email, {
+            "username": username,
+            "gender": gender,
+            "role": role,
+            "active": active
+        })
+        if success:
+            messagebox.showinfo("Thành công", "Cập nhật người dùng thành công.")
+            popup.destroy()
+            self.show_user()
+        else:
+            messagebox.showerror("Lỗi", "Không thể cập nhật người dùng.")
 
     def delete_user(self, email):
-        if messagebox.askyesno("Confirm", "Bạn có chắc chắn muốn xóa người dùng này không?"):
+        confirm = messagebox.askyesno("Xác nhận", f"Bạn có chắc chắn muốn xóa người dùng {email}?")
+        if confirm:
             success = self.user_manager.delete_user(email)
             if success:
-                messagebox.showinfo("Success", "Xóa người dùng thành công.")
+                messagebox.showinfo("Thành công", "Xóa người dùng thành công.")
                 self.show_user()
             else:
-                messagebox.showerror("Error", "Xóa người dùng thất bại.")
-
+                messagebox.showerror("Lỗi", "Không thể xóa người dùng.")

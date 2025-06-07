@@ -97,6 +97,6 @@ class LoginForm:
         dashboard_window = ctk.CTkToplevel(self.master)
         DashboardUI(dashboard_window, role, email)
         dashboard_window.protocol("WM_DELETE_WINDOW", self.on_dashboard_close)
-
     def on_dashboard_close(self):
-        self.master.deiconify()
+        if messagebox.askokcancel("Thoát", "Bạn có chắc muốn đóng cửa sổ?"):
+            self.dashboard_window.destroy()

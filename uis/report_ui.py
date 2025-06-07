@@ -40,7 +40,7 @@ class ReportUI(ctk.CTkFrame):
 
     def count_task_by_status(self):
         tasks = self.task_handler.show_tasks()
-        status_list = ["Completed", "In Progress", "Pending", "Done", "Cancelled"]
+        status_list = ["🟢 Completed", "🟢 In Progress", "🟢 Pending", "🟢 Done", "🟢 Cancelled"]
         status_count = {status: 0 for status in status_list}
 
         for task in tasks:
