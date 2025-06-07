@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from tkinter import messagebox
-from user_manager_handler import UserManager
+from handler.user_manager_handler import UserManager
 
 class RegisterForm:
     def __init__(self, master):
@@ -63,7 +63,7 @@ class RegisterForm:
             messagebox.showerror("Lỗi đăng ký", message)
 
     def show_login_form(self, event=None):
-        from login_form_ui import LoginForm
+        from uis.login_form_ui import LoginForm
         self.master.destroy()
         root = ctk.CTk()
         LoginForm(root)

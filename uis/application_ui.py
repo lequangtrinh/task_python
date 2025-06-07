@@ -1,6 +1,6 @@
 import tkinter as tk
-from login_form_ui import LoginForm
-from register_form_ui import RegisterForm
+from uis.login_form_ui import LoginForm
+from uis.register_form_ui import RegisterForm
 
 class Application:
     def __init__(self, root):

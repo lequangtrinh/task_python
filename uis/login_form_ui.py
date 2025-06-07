@@ -1,9 +1,9 @@
 import customtkinter as ctk
 from tkinter import messagebox
 from tkinter.simpledialog import askstring
-from user_manager_handler import UserManager
-from register_form_ui import RegisterForm
-from dashboard_ui import DashboardUI
+from handler.user_manager_handler import UserManager
+from uis.register_form_ui import RegisterForm
+from uis.dashboard_ui import DashboardUI
 
 class LoginForm:
     def __init__(self, master):
@@ -20,6 +20,7 @@ class LoginForm:
         self.frame.pack(fill="both", expand=True, padx=20, pady=20)
 
         self.user_manager = UserManager(None, None)
+
         self.create_widgets()
 
     def create_widgets(self):
@@ -28,6 +29,16 @@ class LoginForm:
 
         self.password_entry = ctk.CTkEntry(self.frame, placeholder_text="🔑 Mật khẩu", show="*", width=250, height=35, corner_radius=10)
         self.password_entry.pack(pady=10)
+
+        self.show_password_var = ctk.BooleanVar()
+        self.show_password_checkbox = ctk.CTkCheckBox(
+            self.frame,
+            text="Hiện mật khẩu",
+            variable=self.show_password_var,
+            command=self.toggle_password_visibility,
+            width=250
+        )
+        self.show_password_checkbox.pack(anchor="w", padx=75, pady=(0, 10))
 
         forgot_label = ctk.CTkLabel(self.frame, text="Quên mật khẩu?", text_color="blue", cursor="hand2", font=("Arial", 10, "underline"))
         forgot_label.pack()
@@ -43,6 +54,12 @@ class LoginForm:
         register_label = ctk.CTkLabel(self.frame, text="Chưa có tài khoản? Đăng ký", text_color="blue", cursor="hand2", font=("Arial", 10, "underline"))
         register_label.pack()
         register_label.bind("<Button-1>", lambda e: self.show_register_form())
+
+    def toggle_password_visibility(self):
+        if self.show_password_var.get():
+            self.password_entry.configure(show="")  # Hiện mật khẩu
+        else:
+            self.password_entry.configure(show="*")  # Ẩn mật khẩu
 
     def login(self):
         email = self.email_entry.get()

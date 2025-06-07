@@ -2,9 +2,9 @@ import tkinter as tk
 from tkinter import ttk,messagebox
 from datetime import datetime
 from tkcalendar import DateEntry
-from user_manager_handler import UserManager
+from handler.user_manager_handler import UserManager
 import customtkinter as ctk
-from utils import format_date, create_form_input
+from commons.utils import format_date, create_form_input
 class TaskManagerUI:
     def __init__(self, parent, role, user_email, task_manager):
         self.checked_tasks = {}

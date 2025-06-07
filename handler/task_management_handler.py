@@ -6,8 +6,9 @@ class TaskManager:
     def __init__(self, user_email, role):
         self.user_email = user_email
         self.role = role  # role = 'user', 'manage', 'admin'
-        
-        tasks_json = self.load_tasks_from_file(os.path.join(os.path.dirname(os.path.abspath(__file__)), "tasks.json"))
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        tasks_file  = os.path.join(base_dir, "data", "tasks.json")
+        tasks_json = self.load_tasks_from_file(tasks_file)
         try:
             data = json.loads(tasks_json)
             self.tasks = data.get("tasks", []) 

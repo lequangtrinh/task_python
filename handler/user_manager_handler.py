@@ -12,7 +12,9 @@ class UserManager:
     def __init__(self, user_email,role):
         self.user_email = user_email
         self.role = role
-        self.user_file =os.path.join(os.path.dirname(os.path.abspath(__file__)), "users.json")
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        self.user_file = os.path.join(base_dir, "data", "users.json")
+        print(self.user_file)
         self.users = self.load_users()
 
     def load_users(self):
@@ -137,8 +139,8 @@ class UserManager:
             return True, "Người dùng đã được cập nhật."
         
         return False, "Người dùng không tồn tại."
-
-
+    def get_user_by_email(self, email):
+        return self.users.get(email)
     def delete_user(self, email):
         """Xóa người dùng khỏi hệ thống"""
         if email in self.users:

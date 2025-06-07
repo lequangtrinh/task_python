@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from tkinter import ttk, messagebox
 from tkcalendar import DateEntry
-from utils import format_date, create_form_input, on_button_hover, on_button_leave
+from commons.utils import format_date, create_form_input, on_button_hover, on_button_leave
 
 class UserManagementUI:
     def __init__(self, parent, role, user_email, user_manager):
@@ -155,87 +155,86 @@ class UserManagementUI:
             self.delete_user(email)
 
     def create_add_user_screen(self):
-        self.clear_screen()
-        frame = ctk.CTkFrame(self.root)
-        frame.pack(padx=20, pady=20, fill="both", expand=True)
-        self.add_user_email_entry = create_form_input(frame, "Email:", 0)
-        self.add_user_username_entry = create_form_input(frame, "Tên người dùng:", 1)
+        popup = ctk.CTkToplevel(self.root)
+        popup.title("Thêm Người Dùng")
+        popup.geometry("400x350")
+        popup.grab_set()  # Khóa focus popup, modal
 
-        self.add_user_gender_combobox = create_form_input(frame, "Giới tính:", 2, is_combobox=True, values=["Male", "Female", "Other"])
+        self.add_user_email_entry = create_form_input(popup, "Email:", 0)
+        self.add_user_username_entry = create_form_input(popup, "Tên người dùng:", 1)
+        self.add_user_gender_combobox = create_form_input(popup, "Giới tính:", 2, is_combobox=True, values=["Male", "Female", "Other"])
+        self.add_user_role_combobox = create_form_input(popup, "Vai trò:", 3, is_combobox=True, values=["user", "admin", "manage"])
 
-        self.add_user_role_combobox = create_form_input(frame, "Vai trò:", 3, is_combobox=True, values=["user", "admin", "manage"])
+        def submit_add():
+            email = self.add_user_email_entry.get().strip()
+            username = self.add_user_username_entry.get().strip()
+            gender = self.add_user_gender_combobox.get().strip()
+            role = self.add_user_role_combobox.get().strip()
 
-        self.add_user_password_entry = create_form_input(frame, "Mật khẩu:", 4)
+            if not email or not username or not  gender or not role:
+                messagebox.showerror("Error", "Vui lòng nhập đầy đủ thông tin.")
+                return
+            success = self.user_manager.register(email, username, email, gender, role)
+            if success:
+                messagebox.showinfo("Success", "Thêm người dùng thành công.")
+                popup.destroy()
+                self.show_user()
+            else:
+                messagebox.showerror("Error", "Thêm người dùng thất bại. Email có thể đã tồn tại.")
 
-        ctk.CTkButton(frame, text="Thêm", command=self.add_user).grid(row=5, column=0, columnspan=2, pady=10)
-
-    def add_user(self):
-        email = self.add_user_email_entry.get().strip()
-        username = self.add_user_username_entry.get().strip()
-        password = self.add_user_password_entry.get().strip()
-        gender = self.add_user_gender_combobox.get().strip()
-        role = self.add_user_role_combobox.get().strip()
-
-        if not email or not username or not password or not gender or not role:
-            messagebox.showerror("Error", "Vui lòng nhập đầy đủ thông tin.")
-            return
-
-        # Mã hóa mật khẩu trước khi thêm vào
-        password_hashed = self.hash_password(password)
-
-        # Thêm người dùng
-        self.user_manager.add_user(email, username, password_hashed, gender, role)
-        self.clear_screen()
-        self.show_user()
+        ctk.CTkButton(popup, text="Thêm", command=submit_add).grid(row=5, column=0, columnspan=2, pady=10)
 
     def edit_user(self, email):
         user = self.user_manager.get_user_by_email(email)
         if not user:
             messagebox.showerror("Error", "Không tìm thấy người dùng.")
             return
-        self.clear_screen()
-        frame = ctk.CTkFrame(self.root)
-        frame.pack(padx=20, pady=20)
 
-        ctk.CTkLabel(frame, text="Email:").grid(row=0, column=0, padx=10, pady=5)
-        email_entry = ctk.CTkEntry(frame, state="readonly")
-        email_entry.grid(row=0, column=1, padx=10, pady=5)
-        email_entry.insert(0, email)
+        popup = ctk.CTkToplevel(self.root)
+        popup.title(f"Sửa Người Dùng: {email}")
+        popup.geometry("400x300")
+        popup.grab_set()  # modal
 
-        ctk.CTkLabel(frame, text="Tên người dùng:").grid(row=1, column=0, padx=10, pady=5)
-        username_entry = ctk.CTkEntry(frame)
-        username_entry.grid(row=1, column=1, padx=10, pady=5)
+        ctk.CTkLabel(popup, text="Tên người dùng:").grid(row=0, column=0, padx=10, pady=5)
+        username_entry = ctk.CTkEntry(popup)
+        username_entry.grid(row=0, column=1, padx=10, pady=5)
         username_entry.insert(0, user['username'])
 
-        ctk.CTkLabel(frame, text="Giới tính:").grid(row=2, column=0, padx=10, pady=5)
-        gender_cb = ctk.CTkComboBox(frame, values=["Male", "Female", "Other"])
-        gender_cb.grid(row=2, column=1, padx=10, pady=5)
+        ctk.CTkLabel(popup, text="Giới tính:").grid(row=1, column=0, padx=10, pady=5)
+        gender_cb = ctk.CTkComboBox(popup, values=["Male", "Female", "Other"])
+        gender_cb.grid(row=1, column=1, padx=10, pady=5)
         gender_cb.set(user['gender'])
 
-        ctk.CTkLabel(frame, text="Vai trò:").grid(row=3, column=0, padx=10, pady=5)
-        role_cb = ctk.CTkComboBox(frame, values=["user", "admin", "manage"])
-        role_cb.grid(row=3, column=1, padx=10, pady=5)
+        ctk.CTkLabel(popup, text="Vai trò:").grid(row=2, column=0, padx=10, pady=5)
+        role_cb = ctk.CTkComboBox(popup, values=["user", "admin", "manage"])
+        role_cb.grid(row=2, column=1, padx=10, pady=5)
         role_cb.set(user['role'])
 
-        ctk.CTkButton(frame, text="Cập nhật", command=lambda: self.submit_edit_user(email, username_entry, gender_cb, role_cb)).grid(row=4, column=0, columnspan=2, pady=10)
+        def submit_edit():
+            new_username = username_entry.get().strip()
+            new_gender = gender_cb.get().strip()
+            new_role = role_cb.get().strip()
 
-    def submit_edit_user(self, email, username_entry, gender_cb, role_cb):
-        new_username = username_entry.get().strip()
-        new_gender = gender_cb.get().strip()
-        new_role = role_cb.get().strip()
+            if not new_username or not new_gender or not new_role:
+                messagebox.showerror("Error", "Vui lòng điền đầy đủ thông tin.")
+                return
 
-        if not new_username or not new_gender or not new_role:
-            messagebox.showerror("Error", "Vui lòng điền đầy đủ thông tin.")
-            return
+            success = self.user_manager.edit_user(email, new_username, new_gender, new_role)
+            if success:
+                messagebox.showinfo("Success", "Cập nhật người dùng thành công.")
+                popup.destroy()
+                self.show_user()
+            else:
+                messagebox.showerror("Error", "Cập nhật người dùng thất bại.")
 
-        # Cập nhật thông tin người dùng
-        self.user_manager.edit_user(email, new_username, new_gender, new_role)
-        self.clear_screen()
-        self.show_user()
+        ctk.CTkButton(popup, text="Cập nhật", command=submit_edit).grid(row=3, column=0, columnspan=2, pady=10)
 
     def delete_user(self, email):
-        print("delete user")
+        if messagebox.askyesno("Confirm", "Bạn có chắc chắn muốn xóa người dùng này không?"):
+            success = self.user_manager.delete_user(email)
+            if success:
+                messagebox.showinfo("Success", "Xóa người dùng thành công.")
+                self.show_user()
+            else:
+                messagebox.showerror("Error", "Xóa người dùng thất bại.")
 
-    def clear_screen(self):
-        for widget in self.root.winfo_children():
-            widget.destroy()

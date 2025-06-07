@@ -13,12 +13,12 @@
         },
         {
             "password": "e10adc3949ba59abbe56e057f20f883e",
-            "email": "tranminhnat@gmail.com",
-            "role": "user",
-            "username": "Tran Minh Nat",
+            "email": "Tran Minh Nat",
+            "role": "Female",
+            "username": "manage",
             "gender": "Male",
             "create_at": "2025-04-05 09:40:43.035650",
-            "update_at": "2025-04-05 09:40:43.035650",
+            "update_at": "2025-06-07 11:15:58",
             "is_delete": false,
             "active": true
         },
@@ -34,7 +34,7 @@
             "active": true
         },
         {
-            "password": "7331090648c0dd811359587d4fc5d100",
+            "password": "b0baee9d279d34fa1dfd71aadb908c3f",
             "email": "trinh@gmail.com",
             "role": "user",
             "username": "Trinh",
@@ -52,6 +52,17 @@
             "gender": "Male",
             "create_at": "2025-04-05 11:02:18",
             "update_at": "2025-04-05 11:02:18",
+            "is_delete": false,
+            "active": true
+        },
+        {
+            "password": "95b84eaa731785cbbebceaf91920e8d5",
+            "email": "lequangtirnh0811@gmail.com",
+            "role": "Male",
+            "username": "lequangtirnh0811@gmail.com",
+            "gender": "user",
+            "create_at": "2025-06-07 11:21:00",
+            "update_at": "2025-06-07 11:21:00",
             "is_delete": false,
             "active": true
         }
