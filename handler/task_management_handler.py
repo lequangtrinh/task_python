@@ -8,6 +8,7 @@ class TaskManager:
         self.role = role  # role = 'user', 'manage', 'admin'
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         tasks_file  = os.path.join(base_dir, "data", "tasks.json")
+        self.tasks_file=tasks_file
         tasks_json = self.load_tasks_from_file(tasks_file)
         try:
             data = json.loads(tasks_json)
@@ -61,8 +62,6 @@ class TaskManager:
 
     # Kiểm tra thời gian bắt đầu và kết thúc có hợp lệ không
     def check_dates(self, start_date, end_date, task_id=None):
-        print(end_date)
-        print(start_date)
         if (end_date - start_date) < timedelta(minutes=30):
             return "End date must be at least 30 minutes after start date."
         for task in self.tasks:
@@ -76,6 +75,8 @@ class TaskManager:
     
     # Thêm task mới
     def create_task(self, title, description, assigned_to, start_date, end_date, priority, point=0):
+        print(self)
+        print("tao tassk")
         role_check = self.check_role(assigned_to)
         if role_check:
             return role_check
@@ -99,7 +100,7 @@ class TaskManager:
             "point": point
         }
         self.tasks.append(new_task)
-        self.save_tasks_to_file("tasks.json")
+        self.save_tasks_to_file(self.tasks_file)
         return f"Task '{title}' created successfully."
 
     # Cập nhật task
@@ -135,7 +136,7 @@ class TaskManager:
         
         task_to_update["updated_at"] = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
         task_to_update["updated_by"] = self.user_email
-        self.save_tasks_to_file("tasks.json")
+        self.save_tasks_to_file(self.tasks_file)
         return "Task updated successfully!"
 
     # Xóa task

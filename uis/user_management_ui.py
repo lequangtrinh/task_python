@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from tkinter import ttk, messagebox
-
+from commons.utils import is_valid_email
 class UserManagementUI:
     def __init__(self, parent, role, user_email, user_manager):
         self.checked_user = {}
@@ -249,7 +249,7 @@ class UserManagementUI:
         btn_frame = ctk.CTkFrame(popup, fg_color="#f5f7ff")
         btn_frame.grid(row=5, column=0, columnspan=2, pady=20)
 
-        submit_btn = ctk.CTkButton(btn_frame, text="Thêm", width=120, command=lambda: self.add_user(popup))
+        submit_btn = ctk.CTkButton(btn_frame, text="💾 Lưu", width=120, command=lambda: self.add_user(popup))
         submit_btn.grid(row=0, column=0, padx=15)
 
         cancel_btn = ctk.CTkButton(btn_frame, text="Hủy", width=120, fg_color="#e53935", hover_color="#b71c1c", command=popup.destroy)
@@ -265,7 +265,9 @@ class UserManagementUI:
         if not email or not username:
             messagebox.showwarning("Thiếu thông tin", "Vui lòng nhập đầy đủ Email và Tên người dùng.")
             return
-
+        if not is_valid_email(email):
+            messagebox.showerror("Lỗi", "Email không hợp lệ. Vui lòng nhập email đúng định dạng.")
+            return
         success = self.user_manager.add_user(email, {
             "email": email,
             "username": username,
@@ -293,6 +295,12 @@ class UserManagementUI:
         popup.configure(fg_color="#f5f7ff")
 
         ctk.CTkLabel(popup, text="Tên người dùng:", font=ctk.CTkFont(size=13)).grid(row=1, column=0, padx=15, pady=12, sticky="w")
+        # Các label + input
+        ctk.CTkLabel(popup, text="Email:", font=ctk.CTkFont(size=13)).grid(row=0, column=0, padx=15, pady=12, sticky="w")
+        self.edit_user_email_entry = ctk.CTkEntry(popup, width=280, font=ctk.CTkFont(size=12))
+        self.edit_user_email_entry.insert(0, user.get("email", ""))
+        self.edit_user_email_entry.grid(row=0, column=1, pady=12, sticky="ew")
+        self.edit_user_email_entry.configure(state="disabled")
         self.edit_user_username_entry = ctk.CTkEntry(popup, width=280, font=ctk.CTkFont(size=12))
         self.edit_user_username_entry.insert(0, user.get("username", ""))
         self.edit_user_username_entry.grid(row=1, column=1, pady=12, sticky="ew")
@@ -321,21 +329,16 @@ class UserManagementUI:
         cancel_btn.grid(row=0, column=1, padx=15)
 
     def save_user_edit(self, popup, email):
+        email = self.edit_user_email_entry.get().strip()
         username = self.edit_user_username_entry.get().strip()
         gender = self.edit_user_gender_var.get()
         role = self.edit_user_role_var.get()
         active = self.edit_user_active_check.get()
-
         if not username:
             messagebox.showwarning("Thiếu thông tin", "Tên người dùng không được để trống.")
             return
 
-        success = self.user_manager.update_user(email, {
-            "username": username,
-            "gender": gender,
-            "role": role,
-            "active": active
-        })
+        success = self.user_manager.edit_user(email,email,role,username,gender,active)
         if success:
             messagebox.showinfo("Thành công", "Cập nhật người dùng thành công.")
             popup.destroy()

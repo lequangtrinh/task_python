@@ -164,7 +164,7 @@ class TaskManagerUI:
         save_btn = ctk.CTkButton(
             button_frame, text="💾 Lưu", font=("Arial", 12, "bold"),
             fg_color="#2196F3", hover_color="#64B5F6", width=160, height=40,
-            command=lambda: self.create_task
+            command=self.create_task
         )
         save_btn.grid(row=0, column=0, padx=10)
 
@@ -183,7 +183,8 @@ class TaskManagerUI:
     def on_focus_out(self, event):
         event.widget.config(bg_color="white")
     def create_task(self):
-        title = self.create_entries["Tiêu Đề Công Việc:"].get()
+        print("create_task")
+        title = self.create_entries["Tiêu Đề Công Việc:"].get("1.0", "end-1c")
         description = self.create_entries["Mô Tả Công Việc:"].get("1.0", "end-1c")  # Get text area content
         assigned_to = self.create_entries["Người Giao Công Việc (Email):"].get()
         start_date_str = self.create_entries["Ngày Bắt Đầu:"].get_date()  # Get the date from the calendar widget
@@ -193,7 +194,7 @@ class TaskManagerUI:
         if not title or not description or not assigned_to or not start_date_str or not end_date_str or not priority or not point:
             messagebox.showerror("Missing Information", "All fields are required.")
             return
-       
+        
         result = self.task_manager.create_task(title, description, assigned_to, start_date_str, end_date_str, priority, point)
         messagebox.showinfo("Task Creation", result)
         if "successfully" in result:
@@ -201,7 +202,7 @@ class TaskManagerUI:
             self.task_form.destroy()
 
     def clear_form(self):
-        self.create_entries["Tiêu Đề Công Việc:"].delete(0, tk.END)
+        self.create_entries["Tiêu Đề Công Việc:"].delete("1.0", "end-1c")
         self.create_entries["Mô Tả Công Việc:"].delete("1.0", "end-1c")
         self.create_entries["Người Giao Công Việc (Email):"].delete(0, tk.END)
         self.create_entries["Ngày Bắt Đầu:"].set_date('')
@@ -413,7 +414,7 @@ class TaskManagerUI:
         cancel_btn.grid(row=0, column=1, padx=10)
     def update_task(self, task_id):
         # Retrieving form input values
-        title = self.edit_entries["Tiêu Đề Công Việc:"].get()
+        title = self.edit_entries["Tiêu Đề Công Việc:"].get("1.0", "end-1c")
         description = self.edit_entries["Mô Tả Công Việc:"].get("1.0", "end-1c")  # Get text area content
         assigned_to = self.edit_entries["Người Giao Công Việc (Email):"].get()
         start_date_str = self.edit_entries["Ngày Bắt Đầu:"].get_date()  # Get the date from the calendar widget

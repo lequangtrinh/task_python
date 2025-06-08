@@ -13,14 +13,14 @@
         },
         {
             "password": "e10adc3949ba59abbe56e057f20f883e",
-            "email": "Tran Minh Nat",
-            "role": "Female",
-            "username": "manage",
-            "gender": "Male",
+            "email": "manage11",
+            "role": "Male",
+            "username": "Female111",
+            "gender": "Female",
             "create_at": "2025-04-05 09:40:43.035650",
-            "update_at": "2025-06-07 11:15:58",
+            "update_at": "2025-06-08 08:28:40",
             "is_delete": false,
-            "active": true
+            "active": 1
         },
         {
             "password": "e10adc3949ba59abbe56e057f20f883e",

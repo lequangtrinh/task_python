@@ -11,7 +11,7 @@ class LoginForm:
         self.master.title("Đăng Nhập")
         self.master.geometry("400x300")
         self.master.resizable(False, False)
-
+        self.dashboard_window = None
         # Setup appearance
         ctk.set_appearance_mode("light")  # or "dark"
         ctk.set_default_color_theme("blue")  # or "green", "dark-blue", etc.
@@ -95,8 +95,11 @@ class LoginForm:
 
     def show_dashboard(self, role, email):
         dashboard_window = ctk.CTkToplevel(self.master)
+        self.dashboard_window=dashboard_window
         DashboardUI(dashboard_window, role, email)
         dashboard_window.protocol("WM_DELETE_WINDOW", self.on_dashboard_close)
     def on_dashboard_close(self):
         if messagebox.askokcancel("Thoát", "Bạn có chắc muốn đóng cửa sổ?"):
             self.dashboard_window.destroy()
+            self.dashboard_window = None
+        self.master.deiconify()

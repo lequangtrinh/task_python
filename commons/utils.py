@@ -5,6 +5,7 @@ from io import BytesIO
 from datetime import datetime
 from tkcalendar import DateEntry
 import tkinter as tk
+import re
 def set_background_image(widget, image_url):
     try:
         response = requests.get(image_url)
@@ -26,7 +27,9 @@ def create_gradient_button(master, text, width=40, height=2, command=None):
                     active_color="#45a049", text_color="white")
     button.pack(pady=10)
     return button
-
+def is_valid_email(email):
+    pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+    return re.match(pattern, email) is not None
 def format_date(date_str):
     try:
         date_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")

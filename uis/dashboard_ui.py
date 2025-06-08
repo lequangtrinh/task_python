@@ -33,9 +33,8 @@ class DashboardUI:
         
         self.create_widgets()
     def on_close(self):
-        print("on_close triggered")
         if messagebox.askokcancel("Thoát", "Bạn có chắc muốn đóng cửa sổ?"):
-            self.master.destroy()
+            self.logout
     def create_widgets(self):
         # Title bar
         title_frame = ctk.CTkFrame(self.frame_dashboard, fg_color="#4CAF50", height=80)
@@ -69,7 +68,7 @@ class DashboardUI:
         btn_task = ctk.CTkButton(sidebar_frame, text="📝 Quản lý công việc", command=self.show_task_ui)
         btn_task.pack(fill="x", pady=10, padx=10)
 
-        if self.role in ['admin', 'manage']:
+        if self.role in ['admin']:
             btn_user = ctk.CTkButton(sidebar_frame, text="👤 Hiển thị người dùng", command=self.show_user_ui)
             btn_user.pack(fill="x", pady=10, padx=10)
 
@@ -111,7 +110,8 @@ class DashboardUI:
         report_ui = ReportUI(
             parent=self.content_frame,
             user_handler=self.user_manager,
-            task_handler=self.task_manager
+            task_handler=self.task_manager,
+            role=self.role
         )
         report_ui.pack(fill="both", expand=True)
 
