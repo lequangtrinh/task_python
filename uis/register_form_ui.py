@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from tkinter import messagebox
 from handler.user_manager_handler import UserManager
-
+from commons.utils import is_valid_email
 class RegisterForm:
     def __init__(self, master):
         self.master = master
@@ -54,7 +54,12 @@ class RegisterForm:
         username = self.username_entry.get()
         password = self.password_entry.get()
         email = self.email_entry.get()
-
+        if not email or not username:
+            messagebox.showwarning("Thiếu thông tin", "Vui lòng nhập đầy đủ Email và Tên người dùng.")
+            return
+        if not is_valid_email(email):
+            messagebox.showerror("Lỗi", "Email không hợp lệ. Vui lòng nhập email đúng định dạng.")
+            return
         success, message = self.user_manager.register(username, password, email)
         if success:
             messagebox.showinfo("Đăng ký thành công", message)

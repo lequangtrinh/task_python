@@ -4,7 +4,7 @@ import os
 from datetime import datetime
 from email.message import EmailMessage
 import smtplib
-
+import sys
 def hash_md5(password):
     return hashlib.md5(password.encode()).hexdigest()
 
@@ -13,10 +13,15 @@ class UserManager:
         self.user_email = user_email
         self.role = role
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        self.user_file = os.path.join(base_dir, "data", "users.json")
+        self.user_file = self.resource_path(os.path.join("data", "users.json"))
         print(self.user_file)
         self.users = self.load_users()
-
+    def resource_path(self,relative_path):
+        try:
+            base_path = sys._MEIPASS
+        except AttributeError:
+            base_path = os.path.abspath(".")
+        return os.path.join(base_path, relative_path) 
     def load_users(self):
         if not os.path.exists(self.user_file):
             return {}

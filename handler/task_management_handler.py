@@ -2,12 +2,13 @@ from datetime import datetime, timedelta
 import json
 import uuid
 import os
+import sys
 class TaskManager:
     def __init__(self, user_email, role):
         self.user_email = user_email
         self.role = role  # role = 'user', 'manage', 'admin'
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        tasks_file  = os.path.join(base_dir, "data", "tasks.json")
+        tasks_file  =  self.resource_path(os.path.join("data", "tasks.json"))
         self.tasks_file=tasks_file
         tasks_json = self.load_tasks_from_file(tasks_file)
         try:
@@ -18,7 +19,13 @@ class TaskManager:
             self.tasks = []
         except KeyError:
             print('Khóa "tasks" không tồn tại trong JSON.')
-            self.tasks = []      
+            self.tasks = []    
+    def resource_path(self,relative_path):
+        try:
+            base_path = sys._MEIPASS
+        except AttributeError:
+            base_path = os.path.abspath(".")
+        return os.path.join(base_path, relative_path)  
     @staticmethod
     def load_tasks_from_file(file_path):
         try:
