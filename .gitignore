@@ -8,7 +8,6 @@ venv/
 env/
 ENV/
 .venv/
-
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints
 
@@ -40,7 +39,6 @@ coverage.xml
 
 # PyInstaller
 *.spec
-dist/
 build/
 
 # MyPy
