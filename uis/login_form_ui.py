@@ -97,6 +97,7 @@ class LoginForm:
         email_entry = ctk.CTkEntry(popup, width=250, placeholder_text="Email của bạn")
         email_entry.pack(pady=(0, 10))
         def on_close():
+            popup.grab_release()
             popup.destroy()
             self.master.deiconify()
         def send_recovery():
@@ -104,6 +105,7 @@ class LoginForm:
             if email:
                 success, message = self.user_manager.recover_password(email)
                 messagebox.showinfo("Kết quả", message)
+                popup.grab_release()
                 popup.destroy()
                 self.master.deiconify()
             else:
