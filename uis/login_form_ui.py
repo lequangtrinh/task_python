@@ -9,7 +9,7 @@ class LoginForm:
     def __init__(self, master):
         self.master = master
         self.master.title("Đăng Nhập")
-        self.master.geometry("400x300")
+        self.master.geometry("400x350")
         self.master.resizable(False, False)
         self.dashboard_window = None
         # Setup appearance
@@ -85,14 +85,35 @@ class LoginForm:
     def on_register_close(self):
         self.master.deiconify()
 
-    def forgot_password(self, event):
-        email = askstring("Quên mật khẩu", "Nhập email của bạn:")
-        if email:
-            success, message = self.user_manager.recover_password(email)
-            messagebox.showinfo("Kết quả", message)
-        else:
-            messagebox.showerror("Lỗi", "Email không hợp lệ.")
+    def forgot_password(self, event=None):
+        popup = ctk.CTkToplevel()
+        popup.title("Quên mật khẩu")
+        popup.geometry("350x200")
+        popup.grab_set()
 
+        label = ctk.CTkLabel(popup, text="Nhập email để khôi phục mật khẩu:")
+        label.pack(pady=(20, 10))
+
+        email_entry = ctk.CTkEntry(popup, width=250, placeholder_text="Email của bạn")
+        email_entry.pack(pady=(0, 10))
+        def on_close():
+            popup.destroy()
+            self.master.deiconify()
+        def send_recovery():
+            email = email_entry.get()
+            if email:
+                success, message = self.user_manager.recover_password(email)
+                messagebox.showinfo("Kết quả", message)
+                popup.destroy()
+                self.master.deiconify()
+            else:
+                messagebox.showerror("Lỗi", "Vui lòng nhập email hợp lệ.")
+        popup.protocol("WM_DELETE_WINDOW", on_close)
+        submit_btn = ctk.CTkButton(popup, text="Gửi yêu cầu", command=send_recovery)
+        submit_btn.pack(pady=(0, 5))
+
+        cancel_btn = ctk.CTkButton(popup, text="Huỷ", fg_color="gray", command=popup.destroy)
+        cancel_btn.pack()
     def show_dashboard(self, role, email):
         dashboard_window = ctk.CTkToplevel(self.master)
         self.dashboard_window=dashboard_window
