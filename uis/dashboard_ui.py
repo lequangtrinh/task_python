@@ -4,7 +4,7 @@ from uis.task_manager_ui import TaskManagerUI
 from handler.task_management_handler import TaskManager
 from uis.user_management_ui import UserManagementUI
 from handler.user_manager_handler import UserManager
-from uis.report_ui import ReportUI  # Đảm bảo file này dùng ctk widgets
+from uis.report_ui import ReportUI 
 
 
 class DashboardUI:
@@ -36,45 +36,58 @@ class DashboardUI:
         if messagebox.askokcancel("Thoát", "Bạn có chắc muốn đóng cửa sổ?"):
             self.logout
     def create_widgets(self):
-        # Title bar
-        title_frame = ctk.CTkFrame(self.frame_dashboard, fg_color="#4CAF50", height=80)
+        # Title bar đơn giản hóa
+        title_frame = ctk.CTkFrame(self.frame_dashboard, fg_color="#4CAF50", height=60)
         title_frame.grid(row=0, column=0, columnspan=2, sticky="ew", padx=10, pady=10)
 
-        welcome_label = ctk.CTkLabel(
+        title_label = ctk.CTkLabel(
             title_frame,
-            text=f"Chào mừng {self.user_email} - Vai trò: {self.role}",
-            font=ctk.CTkFont("Helvetica", 16, "bold"),
+            text="🧩 Hệ thống quản lý công việc",
+            font=ctk.CTkFont("Helvetica", 18, "bold"),
             text_color="white"
         )
-        welcome_label.grid(row=0, column=0, pady=15, padx=10, sticky="w")
-
-        logout_button = ctk.CTkButton(
-            title_frame,
-            text="Logout",
-            command=self.logout,
-            font=ctk.CTkFont("Helvetica", 12, "bold"),
-            fg_color="#FF5733",
-            hover_color="#e74c3c",
-            text_color="white",
-            width=100
-        )
-        logout_button.grid(row=0, column=1, padx=10, pady=15, sticky="e")
+        title_label.pack(pady=15, padx=20, anchor="w")
 
         # Sidebar menu dọc
-        sidebar_frame = ctk.CTkFrame(self.frame_dashboard, width=200, fg_color="#e0e0e0")
+        sidebar_frame = ctk.CTkFrame(self.frame_dashboard, width=220, fg_color="#e0e0e0")
         sidebar_frame.grid(row=1, column=0, sticky="ns", padx=10, pady=10)
-        sidebar_frame.grid_propagate(False)  # Giữ nguyên chiều rộng
+        sidebar_frame.grid_propagate(False)
 
+        # Thông tin người dùng
+        user_info_frame = ctk.CTkFrame(sidebar_frame, fg_color="#ffffff", corner_radius=12)
+        user_info_frame.pack(pady=(10, 20), padx=10, fill="x")
+        welcome_label = ctk.CTkLabel(
+                     user_info_frame,
+                     text=f"{self.user_email}\nVai trò: {self.role}",
+                     justify="left",
+                     anchor="w",
+                     font=ctk.CTkFont("Helvetica", 14, "bold"),  # Chữ đậm
+                     text_color="#333333",
+                     corner_radius=8,
+                     padx=10,
+                     pady=5
+                            )                   
+        welcome_label.grid(row=0, column=1, sticky="w", padx=5)
+
+        # Các nút điều hướng
         btn_task = ctk.CTkButton(sidebar_frame, text="📝 Quản lý công việc", command=self.show_task_ui)
-        btn_task.pack(fill="x", pady=10, padx=10)
+        btn_task.pack(fill="x", pady=5, padx=10)
 
-        if self.role in ['admin']:
+        if self.role == 'admin':
             btn_user = ctk.CTkButton(sidebar_frame, text="👤 Hiển thị người dùng", command=self.show_user_ui)
-            btn_user.pack(fill="x", pady=10, padx=10)
+            btn_user.pack(fill="x", pady=5, padx=10)
 
         btn_report = ctk.CTkButton(sidebar_frame, text="📊 Báo cáo", command=self.show_report_ui)
-        btn_report.pack(fill="x", pady=10, padx=10)
-
+        btn_report.pack(fill="x", pady=5, padx=10)
+        logout_button = ctk.CTkButton(
+            sidebar_frame,
+            text="👋 Đăng xuất",
+            command=self.logout,
+            font=ctk.CTkFont("Helvetica", 12),
+            hover_color="#e74c3c",
+            height=32
+        )
+        logout_button.pack(fill="x", pady=5, padx=10)
         # Khu vực nội dung bên phải
         self.content_frame = ctk.CTkFrame(self.frame_dashboard, fg_color="transparent")
         self.content_frame.grid(row=1, column=1, sticky="nsew", padx=10, pady=10)
@@ -116,9 +129,7 @@ class DashboardUI:
         report_ui.pack(fill="both", expand=True)
 
     def logout(self):
-        # Nếu bạn muốn làm sạch dữ liệu hoặc reset UI khi logout
-        self.clear_content()
-        self.master.withdraw()
+        self.master.destroy()
         from uis.application_ui import Application
         root = ctk.CTk()
         app = Application(root)

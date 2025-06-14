@@ -6,13 +6,14 @@ from datetime import datetime
 from tkcalendar import DateEntry
 import tkinter as tk
 import re
+
 def set_background_image(widget, image_url):
     try:
         response = requests.get(image_url)
         image_data = response.content
         image = Image.open(BytesIO(image_data))
 
-        image = image.resize((widget.winfo_screenwidth(), widget.winfo_screenheight()), Image.ANTIALIAS)
+        image = image.resize((widget.winfo_screenwidth(), widget.winfo_screenheight()), Image.LANCZOS)
         bg_image = ImageTk.PhotoImage(image)
 
         background_label = ctk.CTkLabel(widget, image=bg_image)
@@ -61,7 +62,6 @@ def create_form_input(parent, label_text, row, is_combobox=False, values=None, i
         entry = ctk.CTkEntry(parent, font=("Arial", 12), width=200, height=30)
         entry.grid(row=row, column=1, padx=10, pady=5)
         return entry
-
 def on_button_hover(self, event):
     self.widget.config(fg_color="#81C784")
 

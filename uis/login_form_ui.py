@@ -86,6 +86,7 @@ class LoginForm:
         self.master.deiconify()
 
     def forgot_password(self, event=None):
+        self.master.withdraw()
         popup = ctk.CTkToplevel()
         popup.title("Quên mật khẩu")
         popup.geometry("350x200")
@@ -100,21 +101,21 @@ class LoginForm:
             popup.grab_release()
             popup.destroy()
             self.master.deiconify()
+            self.master.lift()          
+            self.master.focus_force()  
         def send_recovery():
             email = email_entry.get()
             if email:
                 success, message = self.user_manager.recover_password(email)
                 messagebox.showinfo("Kết quả", message)
-                popup.grab_release()
-                popup.destroy()
-                self.master.deiconify()
+                on_close()
             else:
                 messagebox.showerror("Lỗi", "Vui lòng nhập email hợp lệ.")
         popup.protocol("WM_DELETE_WINDOW", on_close)
         submit_btn = ctk.CTkButton(popup, text="Gửi yêu cầu", command=send_recovery)
         submit_btn.pack(pady=(0, 5))
 
-        cancel_btn = ctk.CTkButton(popup, text="Huỷ", fg_color="gray", command=popup.destroy)
+        cancel_btn = ctk.CTkButton(popup, text="Huỷ", fg_color="gray", command=on_close)
         cancel_btn.pack()
     def show_dashboard(self, role, email):
         dashboard_window = ctk.CTkToplevel(self.master)
